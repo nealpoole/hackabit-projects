@@ -1,0 +1,51 @@
+#!/usr/bin/env php
+<?php
+
+require './bitly.php';
+
+if ($argc != 4)
+{
+	die("Usage: bitly-upload <username> <api-key> <file>\n");
+}
+
+$bit = new Bitly($argv[1], $argv[2]);
+
+$f = fopen($argv[3], 'r');
+
+$data = array();
+
+while (!feof($f) && ($buffer = fread($f, 1024)) !== false) {
+	$short = $bit->shorten('ftp://?' . base64_encode($buffer), 'bit.ly');
+	$data[] = $short['url'];
+
+	echo "Data chunk encoded.\n";
+	sleep(1);
+}
+
+echo "All file data has been uploaded. Creating data structure...\n";
+
+while (count($data) > 1)
+{
+	$tmp_data = array();
+
+	$num_pairs = floor(count($data) / 2);
+
+	for ($i = 0; $i < $num_pairs; ++$i)
+	{
+		$short = $bit->shorten('http://?' . base64_encode($data[$i * 2] . '|' . $data[($i * 2) + 1]), 'bit.ly');
+		$tmp_data[] = $short['url'];
+
+		echo "Node created.\n";
+		sleep(1);
+	}
+
+	// If we have an odd number of nodes, add the unpaired node to the list
+	if (count($data) % 2 === 1)
+		$tmp_data[] = $data[count($data) - 1];
+
+	echo 'Nodes created. ' . count($tmp_data) . " node(s) remaining.\n";
+
+	$data = $tmp_data;
+}
+
+echo 'Your file\'s bit.ly URL is: ' . $data[0] . "\n";

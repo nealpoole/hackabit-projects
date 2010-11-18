@@ -1,0 +1,30 @@
+#!/usr/bin/env php
+<?php
+
+require './bitly.php';
+
+if ($argc != 4)
+{
+	die("Usage: bitly-download <username> <api-key> <uri> > <output file>\n");
+}
+
+$bit = new Bitly($argv[1], $argv[2]);
+
+$uris = array($argv[3]);
+
+while (count($uris) > 0)
+{
+	$cur_uri = $bit->expand(array_pop($uris));
+
+	if (strpos($cur_uri['long_url'], 'ftp://?') !== false)
+	{
+		echo base64_decode(substr($cur_uri['long_url'], strlen('ftp://?')));
+	}
+	else
+	{
+		$children = explode('|', base64_decode(substr($cur_uri['long_url'], strlen('http://?'))));
+		array_push($uris, $children[1], $children[0]);
+	}
+
+	sleep(1);
+}

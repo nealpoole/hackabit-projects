@@ -1,0 +1,7 @@
+- bitly-file-storage: PHP-based CLI tools.
+	= Uploads files in base64 encoded chunks to bit.ly.
+	= Creates a binary tree data-structure to link the chunks together, resulting in a single bit.ly URL that can be used for downloading
+	= Downloading is as simple as a depth-first traversal of the tree using bit.ly's API
+	= Uses the PHP client library for bit.ly from http://classes.verkoyen.eu/bitly/
+
+Thanks to Paul Kernfeld (http://paulkernfeld.com/) for brainstorming the idea with me. :-)
